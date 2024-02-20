@@ -12,7 +12,6 @@ public class Client
         //If you want to hardcode the server IP, you can do it here by replacing the currentIP with the IP
         //as a string, and then commenting out the try/catch block that reads the config file, I just did this
         //because our IP's should not be getting pushed to github.
-        //10.0.0.150
         Properties prop = new Properties();
         String currentIP = "";
 
