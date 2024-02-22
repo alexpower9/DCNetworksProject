@@ -1,28 +1,48 @@
 package Server;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.net.InetAddress;
 
 public class Server 
 {
-    private static void handleClient(Socket clientSocket)
-    {
-        //This is where we will hand out jobs to the clients 
-    }
+    // private static void handleClient(Socket clientSocket)
+    // {
+    //     //This is where we will hand out jobs to the clients 
+    // }
     public static void main(String[] args)
     {
         try
         {
+            InetAddress ip = InetAddress.getLocalHost();
+            System.out.println("Current ip is " + ip.getHostAddress()); //whatver IP is printed here is what the client should use to connect to the server
+
+
             System.out.println("Trying to start server...");
             ServerSocket serverSocket = new ServerSocket(1234); //listens on port 1234 for now
             //it would good for us to use the command line args for this, I think wed get a better grade
 
-            while(true)
-            {
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("New client connected: " + clientSocket.getInetAddress().getHostAddress()); //see who connected
-                new Thread(() -> handleClient(clientSocket)).start(); //handle a connect in a new thread
+            List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
+            while (true) {
+                Socket socket = serverSocket.accept();
+                System.out.println("Client connected");
+
+                ClientHandler clientHandler = new ClientHandler(socket);
+                clientHandlers.add(clientHandler);
+
+                //start a new thread for the client
+                new Thread(clientHandler).start();
+
+                System.out.println(clientHandlers.size() + " clients connected");
+
+                
             }
             
         }
