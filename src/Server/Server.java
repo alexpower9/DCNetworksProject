@@ -1,6 +1,8 @@
 package Server;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -9,12 +11,25 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.net.InetAddress;
 
 public class Server 
 {
-    
-    public static void main(String[] args)
+    //Will create our scanner to loop through the file and send the lines
+    public static Scanner returnFileScanner(String path) throws FileNotFoundException
+    {
+        
+        File file = new File(path);
+        
+        //file existence check
+        if(!file.exists()) throw new FileNotFoundException();
+        
+        return new Scanner(file);
+    }
+    public static void main(String[] args) throws InterruptedException, ExecutionException
     {
         try
         {
@@ -42,9 +57,44 @@ public class Server
                 System.out.println(clientHandlers.size() + " clients connected");
 
                 //This will send a "job" or message to all the clients once someone joins, just to show how the connection works
-                for (ClientHandler handler : clientHandlers)
+                // for (ClientHandler handler : clientHandlers)
+                // {
+                //     handler.sendJob("What up boyz welcome");
+                // }
+
+                if(clientHandlers.size() == 2)
                 {
-                    handler.sendJob("What up boyz welcome");
+                    Scanner fileScanner = returnFileScanner("src/WordFile/TesterExample.txt");
+
+                    // Create a list to hold the futures
+                    List<CompletableFuture<Integer>> futures = new ArrayList<>();
+
+                    while(fileScanner.hasNextLine())
+                    {
+                        String line = fileScanner.nextLine();
+
+                        // Send the line to each client asynchronously
+                        for (ClientHandler handler : clientHandlers)
+                        {
+                            // Create a new future for each line and add it to the list
+                            CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+                                return handler.processRequest(line);
+                            });
+                            futures.add(future);
+                        }
+                    }
+
+                    // Wait for all futures to complete
+                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+                    // Aggregate the results
+                    int total = 0;
+                    for (CompletableFuture<Integer> future : futures)
+                    {
+                        total += future.get();
+                    }
+
+                    System.out.println("Total: " + total);
                 }
 
             }

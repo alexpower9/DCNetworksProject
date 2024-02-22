@@ -29,7 +29,8 @@ public class ClientHandler implements Runnable {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            String request, response;
+            String request;
+            int response;
             while((request = in.readLine()) != null)
             {
                 //proccess all the requests from the server
@@ -58,9 +59,10 @@ public class ClientHandler implements Runnable {
     }
 
     //This is where we go to process the word count from the client, just did this to send messages but we can change this to an int later on
-    private String processRequest(String request)
+    public int processRequest(String request)
     {
-        
-        return "The request was " + request;
+        String[] parts = request.split("\\s+");
+
+        return parts.length;
     }
 }
