@@ -34,18 +34,43 @@ public class WordCounter
 	    return wordCount;
 	}
 
-//	public static void main(String[] args)
-//	{
-//		try
-//		{
-//			System.out.println(wordCount("words.txt"));
-//		} 
-//		catch (FileNotFoundException e)
-//		{
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//
-//	}
+	public static int lineCount(String path) throws FileNotFoundException
+	{
+		// File object
+		File file = new File(path);
+		
+		// file existence check
+		if(!file.exists())  
+			throw new FileNotFoundException();
+		
+		Scanner reader = new Scanner(file);
+		
+	    int lineCount = 0;
+		
+		while(reader.hasNextLine())
+		{
+			reader.nextLine();
+			lineCount++;
+		} 
+		
+	    reader.close();
+	    return lineCount;
+	}
+
+	public static void main(String[] args)
+	{
+		try
+		{
+			//This almost seems to count new lines as word, which is odd
+			System.out.println(wordCount("src/WordFile/TesterExample.txt"));
+			System.out.println(lineCount("src/WordFile/ProjectTextFile.txt"));
+		} 
+		catch (FileNotFoundException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 
 }
