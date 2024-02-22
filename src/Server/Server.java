@@ -41,6 +41,11 @@ public class Server
 
                 System.out.println(clientHandlers.size() + " clients connected");
 
+                //This will send a "job" or message to all the clients once someone joins, just to show how the connection works
+                for (ClientHandler handler : clientHandlers) {
+                    handler.sendJob("What up boyz welcome");
+                }
+
             }
             
         }
