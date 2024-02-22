@@ -10,38 +10,32 @@ public class Client
 {
     public static void main(String[] args)
     {
-        //If you want to hardcode the server IP, you can do it here by replacing the currentIP with the IP
-        //as a string, and then commenting out the try/catch block that reads the config file, I just did this
-        //because our IP's should not be getting pushed to github.
-        Properties prop = new Properties();
-        String currentIP = "10.111.150.235";
-
-        // try
-        // {
-        //     prop.load(new FileInputStream("config.properties"));
-        //     currentIP = prop.getProperty("server-ip");
-        // }
-        // catch(IOException e)
-        // {
-        //     System.out.println("Issue with reading config file: " + e.getMessage());
-        // }
-        //Now we can set up the socket
-        try
+        //Now, we can pass it our IP from the command line. The IP will be printed on the servers console, which we can copy
+        //and enter into the client console to actually connect to our server
+        if(args.length == 1)
         {
-            Socket socket = new Socket(currentIP, 1234);
-            System.out.println("Connected to server");
-            
-            BufferedReader input = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream()));
-            String serverResponse;
-
-            while((serverResponse = input.readLine()) != null)
+            String currentIP = args[0];
+            try
             {
-                System.out.println(serverResponse);
+                Socket socket = new Socket(currentIP, 1234);
+                System.out.println("Connected to server");
+                
+                BufferedReader input = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream()));
+                String serverResponse;
+    
+                while((serverResponse = input.readLine()) != null)
+                {
+                    System.out.println(serverResponse);
+                }
+            }
+            catch(IOException e)
+            {
+                System.out.println("Issue with connecting to server: " + e.getMessage());
             }
         }
-        catch(IOException e)
+        else
         {
-            System.out.println("Issue with connecting to server: " + e.getMessage());
+            System.out.println("Please enter an IP into the command line as an arg to connect to the server.");
         }
     }
 }

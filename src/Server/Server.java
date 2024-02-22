@@ -13,10 +13,7 @@ import java.net.InetAddress;
 
 public class Server 
 {
-    // private static void handleClient(Socket clientSocket)
-    // {
-    //     //This is where we will hand out jobs to the clients 
-    // }
+    
     public static void main(String[] args)
     {
         try
@@ -30,6 +27,8 @@ public class Server
             //it would good for us to use the command line args for this, I think wed get a better grade
 
             List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
+            //synchronized list is necessary since we are using multithreading (I dont really understand it all too well)
+
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connected");
@@ -42,7 +41,6 @@ public class Server
 
                 System.out.println(clientHandlers.size() + " clients connected");
 
-                
             }
             
         }
