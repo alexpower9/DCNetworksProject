@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import java.util.Iterator;
+
 import java.net.InetAddress;
 
 public class Server 
@@ -21,7 +24,6 @@ public class Server
     //Will create our scanner to loop through the file and send the lines
     public static Scanner returnFileScanner(String path) throws FileNotFoundException
     {
-        
         File file = new File(path);
         
         //file existence check
@@ -36,10 +38,8 @@ public class Server
             InetAddress ip = InetAddress.getLocalHost();
             System.out.println("Current ip is " + ip.getHostAddress()); //whatver IP is printed here is what the client should use to connect to the server
 
-
-            System.out.println("Trying to start server...");
+            System.out.println("Starting server...");
             ServerSocket serverSocket = new ServerSocket(1234); //listens on port 1234 for now
-            //it would good for us to use the command line args for this, I think wed get a better grade
 
             List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
             //synchronized list is necessary since we are using multithreading (I dont really understand it all too well)
@@ -56,32 +56,32 @@ public class Server
 
                 System.out.println(clientHandlers.size() + " clients connected");
 
-                //This will send a "job" or message to all the clients once someone joins, just to show how the connection works
-                // for (ClientHandler handler : clientHandlers)
-                // {
-                //     handler.sendJob("What up boyz welcome");
-                // }
 
                 if(clientHandlers.size() == 2)
                 {
-                    Scanner fileScanner = returnFileScanner("src/WordFile/TesterExample.txt");
+                    Scanner fileScanner = returnFileScanner("src/WordFile/ProjectTextFile.txt");
 
                     // Create a list to hold the futures
                     List<CompletableFuture<Integer>> futures = new ArrayList<>();
+                    Iterator<ClientHandler> handlerIterator = clientHandlers.iterator();
 
                     while(fileScanner.hasNextLine())
                     {
                         String line = fileScanner.nextLine();
-
-                        // Send the line to each client asynchronously
-                        for (ClientHandler handler : clientHandlers)
+                    
+                        //if we have gone through all the handlers, go back to the first
+                        if (!handlerIterator.hasNext())
                         {
-                            // Create a new future for each line and add it to the list
-                            CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
-                                return handler.processRequest(line);
-                            });
-                            futures.add(future);
+                            handlerIterator = clientHandlers.iterator();
                         }
+                    
+                        // Get the next handler and send the line to it
+                        ClientHandler handler = handlerIterator.next();
+                    
+                        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
+                            return handler.processRequest(line);
+                        });
+                        futures.add(future);
                     }
 
                     // Wait for all futures to complete
