@@ -61,8 +61,8 @@ public class ClientHandler implements Runnable {
     //This is where we go to process the word count from the client, just did this to send messages but we can change this to an int later on
     public int processRequest(String request)
     {
-        String[] parts = request.split("\\s+");
+        int counter = request.trim().split("\\s+").length;
 
-        return parts.length;
+        return counter;
     }
 }

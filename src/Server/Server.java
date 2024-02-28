@@ -18,9 +18,23 @@ import java.util.concurrent.ExecutionException;
 import java.util.Iterator;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 public class Server 
 {
+    /*
+     * This code may seem weird, but using InetAddress is inconsistent it seems,
+     * especially with macs. So, if we just connect to google, we can get the ip
+     * our machine is using on our network
+     */
+    public static void printIP() throws IOException
+    {
+        Socket s = new Socket();
+        s.connect(new InetSocketAddress("google.com", 80));
+        String ip = s.getLocalAddress().getHostAddress();
+        s.close();
+        System.out.println("Current IP is " + ip);
+    }
     //Will create our scanner to loop through the file and send the lines
     public static Scanner returnFileScanner(String path) throws FileNotFoundException
     {
@@ -35,8 +49,8 @@ public class Server
     {
         try
         {
-            InetAddress ip = InetAddress.getLocalHost();
-            System.out.println("Current ip is " + ip.getHostAddress()); //whatver IP is printed here is what the client should use to connect to the server
+
+            printIP();
 
             System.out.println("Starting server...");
             ServerSocket serverSocket = new ServerSocket(1234); //listens on port 1234 for now
@@ -57,7 +71,7 @@ public class Server
                 System.out.println(clientHandlers.size() + " clients connected");
 
 
-                if(clientHandlers.size() == 2)
+                if(clientHandlers.size() == 3) //change this number to whatever the number of clients we want to solve it with
                 {
                     Scanner fileScanner = returnFileScanner("src/WordFile/ProjectTextFile.txt");
 
