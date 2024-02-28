@@ -21,27 +21,32 @@ public class ClientHandler implements Runnable {
         this.socket = socket;
     }
 
+    public Socket getSocket()
+    {
+        return socket;
+    }
+
     @Override
     public void run()
     {
-        try
-        {
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        // try
+        // {
+        //     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        //     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            String request;
-            int response;
-            while((request = in.readLine()) != null)
-            {
-                //proccess all the requests from the server
-                response = processRequest(request);
-                out.println(response);
-            }
-        } 
-        catch(IOException e)
-        {
-            System.out.println("Error handling client: " + e.getMessage());
-        }
+        //     String request;
+        //     int response;
+        //     while((request = in.readLine()) != null)
+        //     {
+        //         //proccess all the requests from the server
+        //         response = sendJob(request);
+        //         out.println(response);
+        //     }
+        // } 
+        // catch(IOException e)
+        // {
+        //     System.out.println("Error handling client: " + e.getMessage());
+        // }
     }
 
     //use this to see if we can send simple messages
@@ -58,11 +63,4 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    //This is where we go to process the word count from the client, just did this to send messages but we can change this to an int later on
-    public int processRequest(String request)
-    {
-        int counter = request.trim().split("\\s+").length;
-
-        return counter;
-    }
 }

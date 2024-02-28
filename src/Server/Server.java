@@ -71,12 +71,12 @@ public class Server
                 System.out.println(clientHandlers.size() + " clients connected");
 
 
-                if(clientHandlers.size() == 3) //change this number to whatever the number of clients we want to solve it with
+                if(clientHandlers.size() == 1) //change this number to whatever the number of clients we want to solve it with
                 {
-                    Scanner fileScanner = returnFileScanner("src/WordFile/ProjectTextFile.txt");
+                    Scanner fileScanner = returnFileScanner("src/WordFile/TesterExample.txt");
 
                     // Create a list to hold the futures
-                    List<CompletableFuture<Integer>> futures = new ArrayList<>();
+                    //List<CompletableFuture<Integer>> futures = new ArrayList<>();
                     Iterator<ClientHandler> handlerIterator = clientHandlers.iterator();
 
                     while(fileScanner.hasNextLine())
@@ -92,23 +92,20 @@ public class Server
                         // Get the next handler and send the line to it
                         ClientHandler handler = handlerIterator.next();
                     
-                        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
-                            return handler.processRequest(line);
-                        });
-                        futures.add(future);
+                        handler.sendJob(line);
                     }
 
                     // Wait for all futures to complete
-                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+                    // CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
-                    // Aggregate the results
-                    int total = 0;
-                    for (CompletableFuture<Integer> future : futures)
-                    {
-                        total += future.get();
-                    }
+                    // // Aggregate the results
+                    // int total = 0;
+                    // for (CompletableFuture<Integer> future : futures)
+                    // {
+                    //     total += future.get();
+                    // }
 
-                    System.out.println("Total: " + total);
+                    // System.out.println("Total: " + total);
                 }
 
             }
