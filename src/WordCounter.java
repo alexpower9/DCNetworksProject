@@ -62,7 +62,6 @@ public class WordCounter
 		try
 		{
 			//This almost seems to count new lines as word, which is odd
-			System.out.println(wordCount("src/WordFile/TesterExample.txt"));
 			System.out.println(lineCount("src/WordFile/ProjectTextFile.txt"));
 		} 
 		catch (FileNotFoundException e)
