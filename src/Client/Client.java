@@ -31,12 +31,10 @@ public class Client
                     if("END_OF_JOBS".equals(serverResponse))
                     {
                         output.println(wordTotal);
-                        System.out.println("Sent total word count to server. Closing connection...");
+                        System.out.println("Sent total word count of" + wordTotal + " to server. Closing connection...");
                         break;
                     }
                     wordTotal += countWords(serverResponse);
-                    System.out.println("Total words so far: " + wordTotal);
-
                 }
             }
             catch(IOException e)
