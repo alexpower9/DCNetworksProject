@@ -31,7 +31,7 @@ public class Client
                     if("END_OF_JOBS".equals(serverResponse))
                     {
                         output.println(wordTotal);
-                        System.out.println("End of jobs was sent");
+                        System.out.println("Sent total word count to server. Closing connection...");
                         break;
                     }
                     wordTotal += countWords(serverResponse);

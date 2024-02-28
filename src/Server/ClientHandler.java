@@ -81,8 +81,19 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public int getTotal() throws IOException
+    public String readResponse() throws IOException
     {
-        return Integer.parseInt(in.readLine());
+        String response = "empty";
+        BufferedReader input = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream()));
+
+        while((response = input.readLine()) != null)
+        {
+            if(!response.equals("empty"))
+            {
+                return response;
+            }
+        }
+
+        return response;
     }
 }

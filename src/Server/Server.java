@@ -61,8 +61,6 @@ public class Server
             List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
             //synchronized list is necessary since we are using multithreading (I dont really understand it all too well)
 
-            
-
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connected");
@@ -80,55 +78,51 @@ public class Server
                 System.out.println(clientHandlers.size() + " clients connected");
 
 
-                if(clientHandlers.size() == 1) //change this number to whatever the number of clients we want to solve it with
+                if(clientHandlers.size() == 2) //change this number to whatever the number of clients we want to solve it with
                 {
-                    for(ClientHandler handler : clientHandlers)
+                    
+                    ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size()); //thread pool
+                    Scanner fileScanner = returnFileScanner("src/WordFile/TesterExample.txt");
+
+                    Iterator<ClientHandler> handlerIterator = clientHandlers.iterator();
+
+                    while(fileScanner.hasNextLine())
+                    {
+                        String line = fileScanner.nextLine();
+                    
+                        //if we have gone through all the handlers, go back to the first
+                        if (!handlerIterator.hasNext())
+                        {
+                            handlerIterator = clientHandlers.iterator();
+                        }
+                    
+                        // Get the next handler and send the line to it
+                        ClientHandler handler = handlerIterator.next();
+                    
+                        executor.submit(() ->
+                        {
+                            handler.sendJob(line);
+                        });
+                    }
+                    System.out.println("\n*****All lines have been sent to clients*****\n");
+                    executor.shutdown();
+                    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); 
+
+                    int totalWords = 0;
+
+                    //let clients know that the lines are done sending, get their response and add it
+                    for (ClientHandler handler : clientHandlers)
                     {
                         handler.sendEndOfJobs();
+                        String clientResponse = handler.readResponse();
+                        totalWords += Integer.parseInt(clientResponse);
+
+                        System.out.println("Recieved a total of " + clientResponse + " words from client " + (clientHandlers.indexOf(handler) + 1));
                     }
-                //     ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size()); //thread pool
-                //     Scanner fileScanner = returnFileScanner("src/WordFile/TesterExample.txt");
 
-                //     // Create a list to hold the futures
-                //     //List<CompletableFuture<Integer>> futures = new ArrayList<>();
-                //     Iterator<ClientHandler> handlerIterator = clientHandlers.iterator();
+                    System.out.println("\nTotal words: " + totalWords);
 
-                //     while(fileScanner.hasNextLine())
-                //     {
-                //         String line = fileScanner.nextLine();
-                    
-                //         //if we have gone through all the handlers, go back to the first
-                //         if (!handlerIterator.hasNext())
-                //         {
-                //             handlerIterator = clientHandlers.iterator();
-                //         }
-                    
-                //         // Get the next handler and send the line to it
-                //         ClientHandler handler = handlerIterator.next();
-                    
-                //         executor.submit(() ->
-                //         {
-                //             handler.sendJob(line);
-                //         });
-                //     }
-
-                //     executor.shutdown();
-                //     executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); 
-
-                //     int total = 0;
-                //     for (ClientHandler handler : clientHandlers)
-                //     {
-                //         handler.sendEndOfJobs();
-                //         total += handler.getTotal();
-                //     }
-                //     System.out.println(total);
                  }
-
-                 String clientResponse;
-                while((clientResponse = input.readLine()) != null)
-                {
-                    System.out.println("Client response: " + clientResponse);
-                }
             }
             
         }
