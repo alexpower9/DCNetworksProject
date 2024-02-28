@@ -56,20 +56,29 @@ public class ClientHandler implements Runnable {
     //use this to see if we can send simple messages
     public void sendJob(String job)
     {
+        // try
+        // {
+        //     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        //     out.println(job);
+        // }
+        // catch(IOException e)
+        // {
+        //     System.out.println("Error sending job to client: " + e.getMessage());
+        // }
+        this.out.println(job);
+    }
+
+    public void sendEndOfJobs()
+    {
         try
         {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            out.println(job);
+            out.println("END_OF_JOBS");
         }
         catch(IOException e)
         {
             System.out.println("Error sending job to client: " + e.getMessage());
         }
-    }
-
-    public void sendEndOfJobs()
-    {
-        out.println("END_OF_JOBS");
     }
 
     public int getTotal() throws IOException

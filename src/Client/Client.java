@@ -28,9 +28,10 @@ public class Client
     
                 while((serverResponse = input.readLine()) != null)
                 {
-                    if("END_OF_SEND".equals(serverResponse))
+                    if("END_OF_JOBS".equals(serverResponse))
                     {
                         output.println(wordTotal);
+                        System.out.println("End of jobs was sent");
                         break;
                     }
                     wordTotal += countWords(serverResponse);
