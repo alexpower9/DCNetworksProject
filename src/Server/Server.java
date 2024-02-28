@@ -104,9 +104,10 @@ public class Server
                             handler.sendJob(line);
                         });
                     }
-                    System.out.println("\n*****All lines have been sent to clients*****\n");
+
                     executor.shutdown();
-                    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); 
+                    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); //wait for all threads to finish sending their lines out to clients
+                    System.out.println("\n*****All lines have been sent to clients*****\n");
 
                     int totalWords = 0;
 

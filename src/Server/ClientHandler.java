@@ -33,38 +33,12 @@ public class ClientHandler implements Runnable {
     @Override
     public void run()
     {
-        // try
-        // {
-        //     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        //     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-
-        //     String request;
-        //     int response;
-        //     while((request = in.readLine()) != null)
-        //     {
-        //         //proccess all the requests from the server
-        //         response = sendJob(request);
-        //         out.println(response);
-        //     }
-        // } 
-        // catch(IOException e)
-        // {
-        //     System.out.println("Error handling client: " + e.getMessage());
-        // }
+        
     }
 
     //use this to see if we can send simple messages
     public void sendJob(String job)
     {
-        // try
-        // {
-        //     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-        //     out.println(job);
-        // }
-        // catch(IOException e)
-        // {
-        //     System.out.println("Error sending job to client: " + e.getMessage());
-        // }
         this.out.println(job);
     }
 
