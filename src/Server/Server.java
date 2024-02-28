@@ -70,6 +70,10 @@ public class Server
                 ClientHandler clientHandler = new ClientHandler(socket);
                 clientHandlers.add(clientHandler);
 
+                BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+
+
                 //start a new thread for the client
                 new Thread(clientHandler).start();
 
@@ -120,6 +124,11 @@ public class Server
                 //     System.out.println(total);
                  }
 
+                 String clientResponse;
+                while((clientResponse = input.readLine()) != null)
+                {
+                    System.out.println("Client response: " + clientResponse);
+                }
             }
             
         }
