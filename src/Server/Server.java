@@ -12,12 +12,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import java.util.Iterator;
 
-import java.net.InetAddress;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.net.InetSocketAddress;
 
 public class Server 
@@ -27,6 +28,8 @@ public class Server
      * especially with macs. So, if we just connect to google, we can get the ip
      * our machine is using on our network
      */
+
+
     public static void printIP() throws IOException
     {
         Socket s = new Socket();
@@ -58,6 +61,8 @@ public class Server
             List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
             //synchronized list is necessary since we are using multithreading (I dont really understand it all too well)
 
+            
+
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connected");
@@ -65,52 +70,65 @@ public class Server
                 ClientHandler clientHandler = new ClientHandler(socket);
                 clientHandlers.add(clientHandler);
 
+                BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+
+
                 //start a new thread for the client
                 new Thread(clientHandler).start();
 
                 System.out.println(clientHandlers.size() + " clients connected");
 
 
-                if(clientHandlers.size() == 3) //change this number to whatever the number of clients we want to solve it with
+                if(clientHandlers.size() == 1) //change this number to whatever the number of clients we want to solve it with
                 {
-                    Scanner fileScanner = returnFileScanner("src/WordFile/ProjectTextFile.txt");
-
-                    // Create a list to hold the futures
-                    List<CompletableFuture<Integer>> futures = new ArrayList<>();
-                    Iterator<ClientHandler> handlerIterator = clientHandlers.iterator();
-
-                    while(fileScanner.hasNextLine())
+                    for(ClientHandler handler : clientHandlers)
                     {
-                        String line = fileScanner.nextLine();
-                    
-                        //if we have gone through all the handlers, go back to the first
-                        if (!handlerIterator.hasNext())
-                        {
-                            handlerIterator = clientHandlers.iterator();
-                        }
-                    
-                        // Get the next handler and send the line to it
-                        ClientHandler handler = handlerIterator.next();
-                    
-                        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> {
-                            return handler.processRequest(line);
-                        });
-                        futures.add(future);
+                        handler.sendEndOfJobs();
                     }
+                //     ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size()); //thread pool
+                //     Scanner fileScanner = returnFileScanner("src/WordFile/TesterExample.txt");
 
-                    // Wait for all futures to complete
-                    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+                //     // Create a list to hold the futures
+                //     //List<CompletableFuture<Integer>> futures = new ArrayList<>();
+                //     Iterator<ClientHandler> handlerIterator = clientHandlers.iterator();
 
-                    // Aggregate the results
-                    int total = 0;
-                    for (CompletableFuture<Integer> future : futures)
-                    {
-                        total += future.get();
-                    }
+                //     while(fileScanner.hasNextLine())
+                //     {
+                //         String line = fileScanner.nextLine();
+                    
+                //         //if we have gone through all the handlers, go back to the first
+                //         if (!handlerIterator.hasNext())
+                //         {
+                //             handlerIterator = clientHandlers.iterator();
+                //         }
+                    
+                //         // Get the next handler and send the line to it
+                //         ClientHandler handler = handlerIterator.next();
+                    
+                //         executor.submit(() ->
+                //         {
+                //             handler.sendJob(line);
+                //         });
+                //     }
 
-                    System.out.println("Total: " + total);
+                //     executor.shutdown();
+                //     executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); 
+
+                //     int total = 0;
+                //     for (ClientHandler handler : clientHandlers)
+                //     {
+                //         handler.sendEndOfJobs();
+                //         total += handler.getTotal();
+                //     }
+                //     System.out.println(total);
+                 }
+
+                 String clientResponse;
+                while((clientResponse = input.readLine()) != null)
+                {
+                    System.out.println("Client response: " + clientResponse);
                 }
-
             }
             
         }
