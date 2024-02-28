@@ -3,6 +3,7 @@ package Client;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Properties;
 
@@ -22,12 +23,19 @@ public class Client
                 System.out.println("Connected to server");
                 
                 BufferedReader input = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream()));
+                PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
                 String serverResponse;
     
                 while((serverResponse = input.readLine()) != null)
                 {
+                    if("END_OF_SEND".equals(serverResponse))
+                    {
+                        output.println(wordTotal);
+                        break;
+                    }
                     wordTotal += countWords(serverResponse);
                     System.out.println("Total words so far: " + wordTotal);
+
                 }
             }
             catch(IOException e)

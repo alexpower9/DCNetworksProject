@@ -15,10 +15,14 @@ import java.net.Socket;
 public class ClientHandler implements Runnable {
     //each client handler basically takes care of each client, Runnable creates a new thread
     private Socket socket;
+    private BufferedReader in;
+    private PrintWriter out;
 
-    public ClientHandler(Socket socket)
+    public ClientHandler(Socket socket) throws IOException
     {
         this.socket = socket;
+        this.out = new PrintWriter(socket.getOutputStream(), true);
+        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
     public Socket getSocket()
@@ -63,4 +67,13 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    public void sendEndOfJobs()
+    {
+        out.println("END_OF_JOBS");
+    }
+
+    public int getTotal() throws IOException
+    {
+        return Integer.parseInt(in.readLine());
+    }
 }

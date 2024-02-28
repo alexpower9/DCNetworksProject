@@ -12,13 +12,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import java.util.Iterator;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.net.InetSocketAddress;
 
 public class Server 
@@ -28,6 +28,8 @@ public class Server
      * especially with macs. So, if we just connect to google, we can get the ip
      * our machine is using on our network
      */
+
+
     public static void printIP() throws IOException
     {
         Socket s = new Socket();
@@ -59,7 +61,7 @@ public class Server
             List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
             //synchronized list is necessary since we are using multithreading (I dont really understand it all too well)
 
-            ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size()); //use a thread for each client to send lines at the same time to all
+            
 
             while (true) {
                 Socket socket = serverSocket.accept();
@@ -76,6 +78,7 @@ public class Server
 
                 if(clientHandlers.size() == 2) //change this number to whatever the number of clients we want to solve it with
                 {
+                    ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size()); //thread pool
                     Scanner fileScanner = returnFileScanner("src/WordFile/TesterExample.txt");
 
                     // Create a list to hold the futures
@@ -102,18 +105,15 @@ public class Server
                     }
 
                     executor.shutdown();
+                    executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 
-                    // Wait for all futures to complete
-                    // CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-
-                    // // Aggregate the results
-                    // int total = 0;
-                    // for (CompletableFuture<Integer> future : futures)
-                    // {
-                    //     total += future.get();
-                    // }
-
-                    // System.out.println("Total: " + total);
+                    int total = 0;
+                    for (ClientHandler handler : clientHandlers)
+                    {
+                        handler.sendEndOfJobs();
+                        total += handler.getTotal();
+                    }
+                    System.out.println(total);
                 }
 
             }
