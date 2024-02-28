@@ -17,7 +17,8 @@ import java.util.concurrent.ExecutionException;
 
 import java.util.Iterator;
 
-import java.net.InetAddress;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.net.InetSocketAddress;
 
 public class Server 
@@ -58,6 +59,8 @@ public class Server
             List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
             //synchronized list is necessary since we are using multithreading (I dont really understand it all too well)
 
+            ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size()); //use a thread for each client to send lines at the same time to all
+
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("Client connected");
@@ -71,7 +74,7 @@ public class Server
                 System.out.println(clientHandlers.size() + " clients connected");
 
 
-                if(clientHandlers.size() == 1) //change this number to whatever the number of clients we want to solve it with
+                if(clientHandlers.size() == 2) //change this number to whatever the number of clients we want to solve it with
                 {
                     Scanner fileScanner = returnFileScanner("src/WordFile/TesterExample.txt");
 
@@ -92,8 +95,13 @@ public class Server
                         // Get the next handler and send the line to it
                         ClientHandler handler = handlerIterator.next();
                     
-                        handler.sendJob(line);
+                        executor.submit(() ->
+                        {
+                            handler.sendJob(line);
+                        });
                     }
+
+                    executor.shutdown();
 
                     // Wait for all futures to complete
                     // CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();

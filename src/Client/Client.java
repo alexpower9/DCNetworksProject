@@ -27,7 +27,7 @@ public class Client
                 while((serverResponse = input.readLine()) != null)
                 {
                     wordTotal += countWords(serverResponse);
-                    System.out.println("Total words in that line " + wordTotal);
+                    System.out.println("Total words so far: " + wordTotal);
                 }
             }
             catch(IOException e)
