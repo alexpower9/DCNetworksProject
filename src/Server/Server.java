@@ -117,7 +117,7 @@ public class Server
                     }
 
                     long endTime = System.currentTimeMillis();
-                    double elaspedTimeInSeconds = (endTime - startime) / 1000; //convert to seconds
+                    double elaspedTimeInSeconds = (double) (endTime - startime) / 1000; //convert to seconds
 
                     System.out.println("\nTotal words: " + totalWords);
 
