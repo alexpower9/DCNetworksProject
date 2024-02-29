@@ -28,8 +28,6 @@ public class Server
      * especially with macs. So, if we just connect to google, we can get the ip
      * our machine is using on our network
      */
-
-
     public static void printIP() throws IOException
     {
         Socket s = new Socket();
@@ -38,6 +36,7 @@ public class Server
         s.close();
         System.out.println("Current IP is " + ip);
     }
+
     //Will create our scanner to loop through the file and send the lines
     public static Scanner returnFileScanner(String path) throws FileNotFoundException
     {
@@ -59,7 +58,9 @@ public class Server
             ServerSocket serverSocket = new ServerSocket(1234); //listens on port 1234 for now
 
             List<ClientHandler> clientHandlers = Collections.synchronizedList(new ArrayList<>());
-            //synchronized list is necessary since we are using multithreading (I dont really understand it all too well)
+            //synchronized list is necessary since we are using multithreading (no race condition here), only
+            //one thread can access the list at a time, which should guarantee all the lines get sent out properly
+            //later on
 
             while (true) {
                 Socket socket = serverSocket.accept();
@@ -68,16 +69,8 @@ public class Server
                 ClientHandler clientHandler = new ClientHandler(socket);
                 clientHandlers.add(clientHandler);
 
-                BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-
-
-                //start a new thread for the client
-                new Thread(clientHandler).start();
-
                 System.out.println(clientHandlers.size() + " clients connected");
-
-
+              
                 if(clientHandlers.size() == 5) //change this number to whatever the number of clients we want to solve it with
                 {
                     //Start a timer to see how long it takes
@@ -98,7 +91,7 @@ public class Server
                             handlerIterator = clientHandlers.iterator();
                         }
                     
-                        // Get the next handler and send the line to it
+                        //go to the next handler
                         ClientHandler handler = handlerIterator.next();
                     
                         executor.submit(() ->
@@ -127,6 +120,7 @@ public class Server
                     double elaspedTimeInSeconds = (endTime - startime) / 1000; //convert to seconds
 
                     System.out.println("\nTotal words: " + totalWords);
+
                     System.out.println("The total time it took in seconds is " + elaspedTimeInSeconds);
 
                  }

@@ -13,16 +13,14 @@ import java.net.Socket;
  */
 
 public class ClientHandler implements Runnable {
-    //each client handler basically takes care of each client, Runnable creates a new thread
+    //each client handler basically takes care of each client
     private Socket socket;
-    private BufferedReader in;
     private PrintWriter out;
 
     public ClientHandler(Socket socket) throws IOException
     {
         this.socket = socket;
         this.out = new PrintWriter(socket.getOutputStream(), true);
-        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
 
     public Socket getSocket()
@@ -33,7 +31,7 @@ public class ClientHandler implements Runnable {
     @Override
     public void run()
     {
-        
+
     }
 
     //use this to see if we can send simple messages
@@ -44,27 +42,31 @@ public class ClientHandler implements Runnable {
 
     public void sendEndOfJobs()
     {
-        try
-        {
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            out.println("END_OF_JOBS");
-        }
-        catch(IOException e)
-        {
-            System.out.println("Error sending job to client: " + e.getMessage());
-        }
+        // try
+        // {
+        //     PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        //     out.println("END_OF_JOBS");
+        // }
+        // catch(IOException e)
+        // {
+        //     System.out.println("Error sending job to client: " + e.getMessage());
+        // }
+        this.out.println("END_OF_JOBS");
     }
 
     public String readResponse() throws IOException
     {
         String response = "empty";
-        BufferedReader input = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream()));
+        BufferedReader input = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream())); 
+        //listens for a response for client
 
+        //we know a response will be coming, so this works here
         while((response = input.readLine()) != null)
         {
             if(!response.equals("empty"))
             {
                 return response;
+                //when we notice a response, we return it
             }
         }
 
