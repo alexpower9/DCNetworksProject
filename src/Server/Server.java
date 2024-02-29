@@ -70,12 +70,14 @@ public class Server
                 clientHandlers.add(clientHandler);
 
                 System.out.println(clientHandlers.size() + " clients connected");
-
+              
                 if(clientHandlers.size() == 5) //change this number to whatever the number of clients we want to solve it with
                 {
-                    
-                    ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size()); //thread pool the size of the number of clients
-                    Scanner fileScanner = returnFileScanner("src/WordFile/ProjectTextFile.txt");
+                    //Start a timer to see how long it takes
+                    long startime = System.currentTimeMillis();
+
+                    ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size()); //thread pool
+                    Scanner fileScanner = returnFileScanner("src/WordFile/ProjectTextFile.txt"); //change this path for whatever file you want to count
 
                     Iterator<ClientHandler> handlerIterator = clientHandlers.iterator();
 
@@ -114,7 +116,13 @@ public class Server
                         System.out.println("Recieved a total of " + clientResponse + " words from client " + (clientHandlers.indexOf(handler) + 1));
                     }
 
+                    long endTime = System.currentTimeMillis();
+                    double elaspedTimeInSeconds = (endTime - startime) / 1000; //convert to seconds
+
                     System.out.println("\nTotal words: " + totalWords);
+
+                    System.out.println("The total time it took in seconds is " + elaspedTimeInSeconds);
+
                  }
             }
             
