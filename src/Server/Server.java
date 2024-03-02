@@ -102,7 +102,14 @@ public class Server
                     
                         executor.submit(() ->
                         {
-                            handler.sendJob(lines);
+                            try 
+                            {
+                                handler.sendJob(lines);
+                            }
+                            catch (IOException e)
+                            {
+                                e.printStackTrace();
+                            }
                         });
                     }
 

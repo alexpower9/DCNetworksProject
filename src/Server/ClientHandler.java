@@ -2,6 +2,7 @@ package Server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
@@ -17,6 +18,7 @@ public class ClientHandler implements Runnable {
     //each client handler basically takes care of each client
     private Socket socket;
     private PrintWriter out;
+    
 
     public ClientHandler(Socket socket) throws IOException
     {
@@ -36,12 +38,14 @@ public class ClientHandler implements Runnable {
     }
 
     //use this to see if we can send simple messages
-    public void sendJob(List<String> job)
+    public void sendJob(List<String> job) throws IOException
     {
-        this.out.println(job);
+        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+        out.writeObject(job);
+        out.flush();
     }
 
-    public void sendEndOfJobs()
+    public void sendEndOfJobs() throws IOException
     {
         // try
         // {
@@ -52,7 +56,10 @@ public class ClientHandler implements Runnable {
         // {
         //     System.out.println("Error sending job to client: " + e.getMessage());
         // }
-        this.out.println("END_OF_JOBS");
+        List<String> endOfJobs = List.of("END_OF_JOBS");
+        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+        out.writeObject(endOfJobs);
+        out.flush();
     }
 
     public String readResponse() throws IOException

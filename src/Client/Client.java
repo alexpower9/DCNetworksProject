@@ -30,7 +30,7 @@ public class Client
     
                 while((serverResponse = (List<String>) input.readObject()) != null) //we can ignore the warning here since we know the server is sending out lists
                 {
-                    if("END_OF_JOBS".equals(serverResponse))
+                    if(serverResponse != null && serverResponse.get(0).equals("END_OF_JOBS"))
                     {
                         output.println(wordTotal);
                         System.out.println("Sent total word count of " + wordTotal + " to server. Closing connection...");
