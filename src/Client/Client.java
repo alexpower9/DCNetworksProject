@@ -28,17 +28,18 @@ public class Client
                 
                 ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
                 PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-                ArrayList<String> serverResponse;
+                Object serverResponse;
     
-                while((serverResponse = (ArrayList<String>) input.readObject()) != null) //we can ignore the warning here since we know the server is sending out lists
+                while((serverResponse = input.readObject()) != null) //we can ignore the warning here since we know the server is sending out lists
                 {
-                    if(serverResponse != null && serverResponse.get(0).equals("END_OF_JOBS"))
+                    ArrayList<String> serverResponseList = (ArrayList<String>) serverResponse;
+                    if(serverResponseList.get(0).equals("END_OF_JOBS"))
                     {
                         output.println(wordTotal);
                         System.out.println("Sent total word count of " + wordTotal + " to server. Closing connection...");
                         break;
                     }
-                    wordTotal += countWords(serverResponse);
+                    wordTotal += countWords(serverResponseList);
                 }
             }
             catch(IOException e)

@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.net.InetSocketAddress;
 
 public class Server 
@@ -80,7 +81,7 @@ public class Server
                     Scanner fileScanner = returnFileScanner("src/WordFile/ProjectTextFile.txt"); //change this path for whatever file you want to count
 
                     int batchSize = 20;
-                    ArrayList<String> lines = new ArrayList<>(batchSize);
+                    ArrayList<String> lines = new ArrayList<>();
 
                     Iterator<ClientHandler> handlerIterator = clientHandlers.iterator();
 
@@ -100,15 +101,15 @@ public class Server
                         //go to the next handler
                         ClientHandler handler = handlerIterator.next();
                     
-                        executor.submit(() ->
-                        {
-                            try 
-                            {
+                        final AtomicBoolean hasPrinted = new AtomicBoolean(false);
+
+                        executor.submit(() -> {
+                            try {
                                 handler.sendJob(lines);
-                            }
-                            catch (IOException e)
-                            {
-                                e.printStackTrace();
+                            } catch (IOException e) {
+                                if (!hasPrinted.getAndSet(true)) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     }
