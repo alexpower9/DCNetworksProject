@@ -80,7 +80,7 @@ public class Server
                     Scanner fileScanner = returnFileScanner("src/WordFile/ProjectTextFile.txt"); //change this path for whatever file you want to count
 
                     int batchSize = 20;
-                    List<String> lines = new ArrayList<>(batchSize);
+                    ArrayList<String> lines = new ArrayList<>(batchSize);
 
                     Iterator<ClientHandler> handlerIterator = clientHandlers.iterator();
 

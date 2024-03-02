@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 public class Client 
 {
     public static int wordTotal = 0;
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) throws ClassNotFoundException
     {
         //Now, we can pass it our IP from the command line. The IP will be printed on the servers console, which we can copy
@@ -26,9 +28,9 @@ public class Client
                 
                 ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
                 PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-                List<String> serverResponse;
+                ArrayList<String> serverResponse;
     
-                while((serverResponse = (List<String>) input.readObject()) != null) //we can ignore the warning here since we know the server is sending out lists
+                while((serverResponse = (ArrayList<String>) input.readObject()) != null) //we can ignore the warning here since we know the server is sending out lists
                 {
                     if(serverResponse != null && serverResponse.get(0).equals("END_OF_JOBS"))
                     {
@@ -50,7 +52,7 @@ public class Client
         }
     }
 
-    public static int countWords(List<String> lines)
+    public static int countWords(ArrayList<String> lines)
     {
         int count = 0;
 

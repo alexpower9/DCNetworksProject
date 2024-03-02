@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -38,11 +41,11 @@ public class ClientHandler implements Runnable {
     }
 
     //use this to see if we can send simple messages
-    public void sendJob(List<String> job) throws IOException
+    public void sendJob(ArrayList<String> job) throws IOException
     {
-        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-        out.writeObject(job);
-        out.flush();
+        ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+        output.writeObject(job);
+        output.flush();
     }
 
     public void sendEndOfJobs() throws IOException
@@ -56,10 +59,10 @@ public class ClientHandler implements Runnable {
         // {
         //     System.out.println("Error sending job to client: " + e.getMessage());
         // }
-        List<String> endOfJobs = List.of("END_OF_JOBS");
-        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-        out.writeObject(endOfJobs);
-        out.flush();
+        ArrayList<String> endOfJobs = new ArrayList<String>(Arrays.asList("END_OF_JOBS"));
+        ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+        output.writeObject(endOfJobs);
+        output.flush();
     }
 
     public String readResponse() throws IOException
