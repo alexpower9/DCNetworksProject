@@ -20,13 +20,13 @@ import java.util.List;
 public class ClientHandler implements Runnable {
     //each client handler basically takes care of each client
     private Socket socket;
-    private PrintWriter out;
+    private ObjectOutputStream output;
     
 
     public ClientHandler(Socket socket) throws IOException
     {
         this.socket = socket;
-        this.out = new PrintWriter(socket.getOutputStream(), true);
+        this.output = new ObjectOutputStream(socket.getOutputStream());
     }
 
     public Socket getSocket()
@@ -43,9 +43,9 @@ public class ClientHandler implements Runnable {
     //use this to see if we can send simple messages
     public void sendJob(ArrayList<String> job) throws IOException
     {
-        ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
         output.writeObject(job);
         output.flush();
+        output.reset();
     }
 
     public void sendEndOfJobs() throws IOException
@@ -60,9 +60,9 @@ public class ClientHandler implements Runnable {
         //     System.out.println("Error sending job to client: " + e.getMessage());
         // }
         ArrayList<String> endOfJobs = new ArrayList<String>(Arrays.asList("END_OF_JOBS"));
-        ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
         output.writeObject(endOfJobs);
         output.flush();
+        output.reset();
     }
 
     public String readResponse() throws IOException
