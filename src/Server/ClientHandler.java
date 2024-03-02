@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.List;
 
 /*
  * Got the ideas for this from the following sources:
@@ -35,7 +36,7 @@ public class ClientHandler implements Runnable {
     }
 
     //use this to see if we can send simple messages
-    public void sendJob(String job)
+    public void sendJob(List<String> job)
     {
         this.out.println(job);
     }

@@ -71,7 +71,7 @@ public class Server
 
                 System.out.println(clientHandlers.size() + " clients connected");
               
-                if(clientHandlers.size() == 5) //change this number to whatever the number of clients we want to solve it with
+                if(clientHandlers.size() == 2) //change this number to whatever the number of clients we want to solve it with
                 {
                     //Start a timer to see how long it takes
                     long startime = System.currentTimeMillis();
@@ -79,11 +79,17 @@ public class Server
                     ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size()); //thread pool
                     Scanner fileScanner = returnFileScanner("src/WordFile/ProjectTextFile.txt"); //change this path for whatever file you want to count
 
+                    int batchSize = 20;
+                    List<String> lines = new ArrayList<>(batchSize);
+
                     Iterator<ClientHandler> handlerIterator = clientHandlers.iterator();
 
                     while(fileScanner.hasNextLine())
                     {
-                        String line = fileScanner.nextLine();
+                        for (int i = 0; i < batchSize && fileScanner.hasNextLine(); i++)
+                        {
+                            lines.add(fileScanner.nextLine());
+                        }
                     
                         //if we have gone through all the handlers, go back to the first
                         if (!handlerIterator.hasNext())
@@ -96,7 +102,7 @@ public class Server
                     
                         executor.submit(() ->
                         {
-                            handler.sendJob(line);
+                            handler.sendJob(lines);
                         });
                     }
 

@@ -3,14 +3,16 @@ package Client;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.List;
 import java.util.Properties;
 
 public class Client 
 {
     public static int wordTotal = 0;
-    public static void main(String[] args)
+    public static void main(String[] args) throws ClassNotFoundException
     {
         //Now, we can pass it our IP from the command line. The IP will be printed on the servers console, which we can copy
         //and enter into the client console to actually connect to our server
@@ -22,11 +24,11 @@ public class Client
                 Socket socket = new Socket(currentIP, 1234);
                 System.out.println("Connected to server");
                 
-                BufferedReader input = new BufferedReader(new java.io.InputStreamReader(socket.getInputStream()));
+                ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
                 PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
-                String serverResponse;
+                List<String> serverResponse;
     
-                while((serverResponse = input.readLine()) != null)
+                while((serverResponse = (List<String>) input.readObject()) != null) //we can ignore the warning here since we know the server is sending out lists
                 {
                     if("END_OF_JOBS".equals(serverResponse))
                     {
@@ -48,9 +50,14 @@ public class Client
         }
     }
 
-    public static int countWords(String line)
+    public static int countWords(List<String> lines)
     {
-        int count = line.trim().split("\\s+").length;
+        int count = 0;
+
+        for(String line : lines)
+        {
+            count += line.trim().split("\\s+").length;
+        }
 
         return count;
     }
