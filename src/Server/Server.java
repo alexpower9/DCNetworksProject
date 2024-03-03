@@ -2,13 +2,16 @@ package Server;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
@@ -71,34 +74,58 @@ public class Server
 
                 System.out.println(clientHandlers.size() + " clients connected");
               
-                if(clientHandlers.size() == 5) //change this number to whatever the number of clients we want to solve it with
+                if(clientHandlers.size() == 1) //change this number to whatever the number of clients we want to solve it with
                 {
                     //Start a timer to see how long it takes
                     long startime = System.currentTimeMillis();
 
                     ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size()); //thread pool
-                    Scanner fileScanner = returnFileScanner("src/WordFile/ProjectTextFile.txt"); //change this path for whatever file you want to count
 
-                    Iterator<ClientHandler> handlerIterator = clientHandlers.iterator();
+                    FileInputStream fis = null;
+                    try {
+                        fis = new FileInputStream("src/WordFile/ProjectTextFile.txt"); //change this path for whatever file you want to count
 
-                    while(fileScanner.hasNextLine())
-                    {
-                        String line = fileScanner.nextLine();
-                    
-                        //if we have gone through all the handlers, go back to the first
-                        if (!handlerIterator.hasNext())
-                        {
-                            handlerIterator = clientHandlers.iterator();
+                        byte[] fileContent = fis.readAllBytes();
+                        int chunkSize = (int) Math.ceil((double) fileContent.length / clientHandlers.size());
+
+                        String lastWord = "";
+                        for (int i = 0; i < clientHandlers.size(); i++) {
+                            int start = i * chunkSize;
+                            int end = Math.min(start + chunkSize, fileContent.length);
+                            byte[] chunk = Arrays.copyOfRange(fileContent, start, end);
+
+                            // convert to char and display it
+                            String line = new String(chunk, StandardCharsets.UTF_8);
+
+                            // Check if the last character is a whitespace character
+                            if (!Character.isWhitespace(line.charAt(line.length() - 1))) {
+                                // If it's not, split the line into words
+                                String[] words = line.split("\\s+");
+                                // Remove the last word from the line
+                                line = String.join(" ", Arrays.copyOfRange(words, 0, words.length - 1));
+                                // Save the last word for the next chunk
+                                lastWord = words[words.length - 1];
+                            }
+
+                            // Add the last word from the previous chunk to the current line
+
+                            ClientHandler handler = clientHandlers.get(i);
+                            
+                            final String finalLine = line;
+                            executor.submit(() -> {
+                                handler.sendJob(finalLine);
+                            });
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (fis != null)
+                                    fis.close();
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
                         }
-                    
-                        //go to the next handler
-                        ClientHandler handler = handlerIterator.next();
-                    
-                        executor.submit(() ->
-                        {
-                            handler.sendJob(line);
-                        });
-                    }
 
                     executor.shutdown();
                     executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); //wait for all threads to finish sending their lines out to clients
