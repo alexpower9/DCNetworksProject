@@ -74,7 +74,7 @@ public class Server
 
                 System.out.println(clientHandlers.size() + " clients connected");
               
-                if(clientHandlers.size() == 1) //change this number to whatever the number of clients we want to solve it with
+                if(clientHandlers.size() == 5) //change this number to whatever the number of clients we want to solve it with
                 {
                     //Start a timer to see how long it takes
                     long startime = System.currentTimeMillis();
@@ -82,51 +82,47 @@ public class Server
                     ExecutorService executor = Executors.newFixedThreadPool(clientHandlers.size()); //thread pool
 
                     FileInputStream fis = null;
-                    try {
+                    try 
+                    {
                         fis = new FileInputStream("src/WordFile/ProjectTextFile.txt"); //change this path for whatever file you want to count
 
                         byte[] fileContent = fis.readAllBytes();
                         int chunkSize = (int) Math.ceil((double) fileContent.length / clientHandlers.size());
 
-                        String lastWord = "";
-                        for (int i = 0; i < clientHandlers.size(); i++) {
+                        for (int i = 0; i < clientHandlers.size(); i++)
+                        {
+                            //determine which portion of our orignal byte array to send
                             int start = i * chunkSize;
                             int end = Math.min(start + chunkSize, fileContent.length);
                             byte[] chunk = Arrays.copyOfRange(fileContent, start, end);
 
-                            // convert to char and display it
+                            //convert chunk to a string
                             String line = new String(chunk, StandardCharsets.UTF_8);
 
-                            // Check if the last character is a whitespace character
-                            if (!Character.isWhitespace(line.charAt(line.length() - 1))) {
-                                // If it's not, split the line into words
-                                String[] words = line.split("\\s+");
-                                // Remove the last word from the line
-                                line = String.join(" ", Arrays.copyOfRange(words, 0, words.length - 1));
-                                // Save the last word for the next chunk
-                                lastWord = words[words.length - 1];
-                            }
-
-                            // Add the last word from the previous chunk to the current line
-
+                            //we need to add some logic to handle chunking in middle of words, will hurt our accuracy
                             ClientHandler handler = clientHandlers.get(i);
                             
                             final String finalLine = line;
-                            executor.submit(() -> {
+                            executor.submit(() -> 
+                            {
                                 handler.sendJob(finalLine);
                             });
-                            }
-                        } catch (IOException e) {
+                        }
+                        } catch(IOException e)
+                        {
                             e.printStackTrace();
-                        } finally {
-                            try {
-                                if (fis != null)
-                                    fis.close();
-                            } catch (IOException ex) {
+                        } 
+                        finally 
+                        {
+                            try 
+                            {
+                                if (fis != null) fis.close();
+                            } 
+                            catch(IOException ex) 
+                            {
                                 ex.printStackTrace();
                             }
                         }
-
                     executor.shutdown();
                     executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); //wait for all threads to finish sending their lines out to clients
                     System.out.println("\n*****All lines have been sent to clients*****\n");
@@ -150,7 +146,7 @@ public class Server
 
                     System.out.println("The total time it took in seconds is " + elaspedTimeInSeconds);
 
-                 }
+                }
             }
             
         }
